@@ -1,12 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import "./style.css";
 
 function Home() {
   return (
-    <div style={{ padding: 24 }}>
+    <div className="home-center">
       <h1>Welcome to the Call Center Support Tool</h1>
       <p>This tool lets call support workers track their calls, view statistics, and manage call data.</p>
-      <div style={{ marginTop: 24 }}>
+      <div>
         <Link to="/dashboard">
           <button>Go to App</button>
         </Link>
