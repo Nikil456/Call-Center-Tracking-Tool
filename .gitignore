@@ -1,0 +1,39 @@
+# Node.js dependencies
+node_modules/
+call-support-app/node_modules/
+call-support-backend/node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Build and dist outputs
+call-support-app/build/
+call-support-backend/build/
+call-support-app/dist/
+call-support-backend/dist/
+
+# Environment variables
+.env
+.env.*
+
+# React & general logs
+*.log
+
+# React environment files
+*.env.local
+*.env.development.local
+*.env.test.local
+*.env.production.local
+
+# Coverage reports
+coverage/
+
+# Miscellaneous
+*.tgz
+*.swp
+.idea/
+.vscode/
+.DS_Store
