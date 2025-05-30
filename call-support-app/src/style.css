@@ -1,0 +1,104 @@
+:root {
+    --primary: #2563eb;
+    --accent: #38bdf8;
+    --success: #22c55e;
+    --error: #f87171;
+    --bg: #f8fafc;
+    --surface: #fff;
+    --text: #1e293b;
+  }
+  
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Roboto', Arial, sans-serif;
+    margin: 0;
+  }
+
+
+  
+  button {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s;
+  }
+  
+  button:hover {
+    background: var(--accent);
+  }
+  
+  /* Nav bar: right-align */
+  nav {
+    display: flex;
+    background-color: #dadada;
+    justify-content: flex-end;
+    gap: 24px;
+    padding: 12px 24px;
+    margin-bottom: 24px;
+  }
+
+  .nav-link,
+  .nav-link:visited,
+  .nav-link:active,
+  .nav-link:focus {
+    color: black;        /* Or your preferred color */
+    font-size: clamp(1rem, 2vw, 1.3rem);
+    transition: color 0.5s, transform 0.12s;
+    text-decoration: none;
+    outline: none;
+  }
+
+  .nav-link:hover {
+    color: #2563eb;        /* Example: change color on hover */
+    transform: scale(1.05); /* Make text grow by 13% on hover */
+  }
+  
+  /* Home page: center everything */
+  .home-center {
+    height: 65vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  
+  
+  .home-center button {
+    /* Responsive padding: min 10px, scales with screen up to 28px/56px */
+    padding: clamp(10px, 0.5vw, 28px) clamp(20px, 1.5vw, 56px);
+  
+    font-size: clamp(1rem, 1.8vw, 1.5rem);  /* Responsive font size */
+    border-radius: clamp(5px, 2vw, 16px);   /* Responsive border radius */
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    margin: 0 2vw;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s, transform 0.45s;
+  }
+  
+  .home-center button:hover {
+    background: #1e40af;
+    transform: translateY(-2px) scale(1.04);
+  }
+  
+  
+  
+  .home-center h1 {
+    margin-bottom: 12px;
+    font-size: 6vh;
+    
+  }
+  
+  .home-center p {
+    margin-bottom: 24px;
+    font-size: 2vh;
+  }
+  
