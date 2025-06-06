@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './style.css'
-
-const workerId = 'worker1';
+import './style.css';
 
 function getDaysInMonth(year, month) {
   const date = new Date(year, month, 1);
@@ -25,14 +23,13 @@ function chunkRowWise(arr, chunkSize) {
   return result;
 }
 
-function App() {
+function Dashboard({ user }) {
   const [onCall, setOnCall] = useState(false);
   const [calls, setCalls] = useState([]);
   const [stats, setStats] = useState([]);
   const [deleteId, setDeleteId] = useState('');
   const [deleteMsg, setDeleteMsg] = useState('');
 
-  // Month/year state for calendar navigation
   const today = new Date();
   const todayString = dateToString(today);
   const [month, setMonth] = useState(today.getMonth());
@@ -43,52 +40,19 @@ function App() {
   const viewingToday = selectedDate === todayString;
   const callsForDay = calls.filter(c => c.date === selectedDate);
 
-  const cellHeight = 120; // px, adjust as needed
+  const cellHeight = 120;
   const maxRows = Math.max(1, Math.floor(window.innerHeight * 0.7 / cellHeight));
   const rows = chunkRowWise(callsForDay, maxRows);
 
-  // Handlers for navigating months
-  function handlePrevMonth() {
-    let newMonth = month - 1;
-    let newYear = year;
-    if (newMonth < 0) {
-      newMonth = 11;
-      newYear = year - 1;
-    }
-    setMonth(newMonth);
-    setYear(newYear);
-    // If selected date is not in new month, set to first of month
-    const newSelected = new Date(newYear, newMonth, 1);
-    setSelectedDate(dateToString(newSelected));
-  }
-
-  function handleNextMonth() {
-    let newMonth = month + 1;
-    let newYear = year;
-    if (newMonth > 11) {
-      newMonth = 0;
-      newYear = year + 1;
-    }
-    setMonth(newMonth);
-    setYear(newYear);
-    const newSelected = new Date(newYear, newMonth, 1);
-    setSelectedDate(dateToString(newSelected));
-  }
-
-  function goToCurrentMonth() {
-    setMonth(today.getMonth());
-    setYear(today.getFullYear());
-    setSelectedDate(dateToString(today));
-  }
-
   useEffect(() => {
-    fetchCalls();
-    fetchStats();
-    // eslint-disable-next-line
-  }, []);
+    if (user) {
+      fetchCalls();
+      fetchStats();
+    }
+  }, [user]);
 
   const fetchCalls = async () => {
-    const res = await fetch(`http://localhost:4000/api/calls?workerId=${workerId}`);
+    const res = await fetch(`http://localhost:4000/api/calls?userId=${user.id}`);
     const data = await res.json();
     setCalls(data);
     const ongoing = data.some(c => !c.end && c.date === todayString);
@@ -96,7 +60,7 @@ function App() {
   };
 
   const fetchStats = async () => {
-    const res = await fetch(`http://localhost:4000/api/statistics?workerId=${workerId}`);
+    const res = await fetch(`http://localhost:4000/api/statistics?userId=${user.id}`);
     setStats(await res.json());
   };
 
@@ -104,7 +68,7 @@ function App() {
     await fetch('http://localhost:4000/api/start', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ workerId }),
+      body: JSON.stringify({ userId: user.id }),
     });
     setOnCall(true);
     fetchCalls();
@@ -115,7 +79,7 @@ function App() {
     await fetch('http://localhost:4000/api/stop', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ workerId }),
+      body: JSON.stringify({ userId: user.id }),
     });
     setOnCall(false);
     fetchCalls();
@@ -128,7 +92,7 @@ function App() {
     const res = await fetch('http://localhost:4000/api/delete', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ callId: deleteId }),
+      body: JSON.stringify({ callId: deleteId, userId: user.id }),
     });
     if (res.ok) {
       setDeleteMsg('Call deleted.');
@@ -141,39 +105,57 @@ function App() {
     }
   };
 
+  const handlePrevMonth = () => {
+    let newMonth = month - 1;
+    let newYear = year;
+    if (newMonth < 0) {
+      newMonth = 11;
+      newYear = year - 1;
+    }
+    setMonth(newMonth);
+    setYear(newYear);
+    setSelectedDate(dateToString(new Date(newYear, newMonth, 1)));
+  };
+
+  const handleNextMonth = () => {
+    let newMonth = month + 1;
+    let newYear = year;
+    if (newMonth > 11) {
+      newMonth = 0;
+      newYear = year + 1;
+    }
+    setMonth(newMonth);
+    setYear(newYear);
+    setSelectedDate(dateToString(new Date(newYear, newMonth, 1)));
+  };
+
+  const goToCurrentMonth = () => {
+    setMonth(today.getMonth());
+    setYear(today.getFullYear());
+    setSelectedDate(dateToString(today));
+  };
+
+  if (!user) return <div>Loading...</div>;
+
   return (
     <div style={{ padding: 24 }}>
       <h1 className="dashboard-heading">Call Support Dashboard</h1>
-      
-      {/* Calendar Month Navigation */}
+
       <div className="month-nav">
-      <button
-        className="month-arrow-btn"
-        onClick={handlePrevMonth}
-        aria-label="Previous Month"
-      >
-        &#8592;
-      </button>
-      <h2 className="month-heading" style={{ margin: '0 0', minWidth: 170 }}>
-        {new Date(year, month).toLocaleString('default', { month: 'long' })} {year}
-      </h2>
-      <button
-        className="month-arrow-btn"
-        onClick={handleNextMonth}
-        aria-label="Next Month"
-      >
-        &#8594;
-      </button>
-      <button
-        className="current-month-btn"
-        onClick={goToCurrentMonth}
-      >
-        Current Month
-      </button>
-    </div>
+        <button className="month-arrow-btn" onClick={handlePrevMonth}>
+          &#8592;
+        </button>
+        <h2 className="month-heading">
+          {new Date(year, month).toLocaleString('default', { month: 'long' })} {year}
+        </h2>
+        <button className="month-arrow-btn" onClick={handleNextMonth}>
+          &#8594;
+        </button>
+        <button className="current-month-btn" onClick={goToCurrentMonth}>
+          Current Month
+        </button>
+      </div>
 
-
-      {/* Calendar grid */}
       <div className="calendar-grid">
         {daysInMonth.map(day => {
           const str = dateToString(day);
@@ -196,19 +178,18 @@ function App() {
       </div>
 
       <h2 className="calls-for-heading">
-        Calls for {new Date(selectedDate).toLocaleDateString('en-US', { year: '2-digit', month: '2-digit', day: '2-digit' })}
+        Calls for {new Date(selectedDate).toLocaleDateString('en-US')}
         {viewingToday && " (Today)"}
       </h2>
 
-      {/* Start/Stop Call AND Delete Call, on one line */}
       <div className="flex-row-center">
-      {viewingToday && (
-        !onCall ? (
-          <button className="start-call-btn" onClick={startCall}>Start Call</button>
-        ) : (
-          <button className="stop-call-btn" onClick={stopCall}>Stop Call</button>
-        )
-      )}
+        {viewingToday &&
+          (!onCall ? (
+            <button className="start-call-btn" onClick={startCall}>Start Call</button>
+          ) : (
+            <button className="stop-call-btn" onClick={stopCall}>Stop Call</button>
+          ))
+        }
 
         <input
           type="number"
@@ -226,7 +207,6 @@ function App() {
         )}
       </div>
 
-      {/* Calls Table */}
       <table className="call-table">
         <tbody>
           {rows.length === 0 ? (
@@ -247,8 +227,7 @@ function App() {
                             const secs = Math.floor(seconds % 60);
                             return `${mins > 0 ? mins + "m " : ""}${secs}s`;
                           })()
-                        : "—"
-                      }
+                        : "—"}
                     </div>
                   </td>
                 ) : (
@@ -263,4 +242,4 @@ function App() {
   );
 }
 
-export default App;
+export default Dashboard;

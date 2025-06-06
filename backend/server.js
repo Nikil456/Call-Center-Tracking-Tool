@@ -6,6 +6,28 @@ const PORT = 4000;
 app.use(cors());
 app.use(express.json());
 
+require('dotenv').config();
+
+const mongoose = require('mongoose');
+
+
+const authRoutes = require('./routes/auth');
+const callRoutes = require('./routes/calls');
+
+
+app.use(cors());
+app.use(express.json());
+
+app.use('/api/auth', authRoutes);
+app.use('/api/calls', callRoutes);
+
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => {
+    app.listen(4000, () => console.log('Server running on port 4000'));
+  })
+  .catch(err => console.error(err));
+
+
 // In-memory storage
 let calls = []; // { id, start, end, date }
 
